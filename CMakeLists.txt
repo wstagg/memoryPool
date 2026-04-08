@@ -20,7 +20,7 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(Tests main.cpp)
+add_executable(Tests MemoryPoolTests.cpp)
 
 target_link_libraries(Tests GTest::gtest_main)
 
