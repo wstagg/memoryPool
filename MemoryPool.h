@@ -1,8 +1,6 @@
 #pragma once
 #include <cstddef>
-#include <stdexcept>
-#include <print>
-
+#include <utility>
 
 template<typename T, std::size_t capacity>
 class MemoryPool
@@ -50,5 +48,9 @@ private:
 
     Data storage[capacity];
     Data head;
-    Data* data(const std::size_t i){return &storage[i];};
+    
+    Data* data(const std::size_t i)
+    {
+        return &storage[i];
+    };
 };

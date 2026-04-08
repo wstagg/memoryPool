@@ -1,5 +1,5 @@
-#include <print>
 #include "MemoryPool.h"
+#include <gtest/gtest.h>
 
 struct Vector_3f
 {
@@ -8,30 +8,62 @@ struct Vector_3f
     double z;
 };
 
-int main()
+TEST(MemoryPoolTests, TestAllocation)
 {
-    MemoryPool<Vector_3f, 5> allocater;
-    auto a = allocater.allocate({1, 2, 3});
-    auto b = allocater.allocate({2, 2, 3});
-    auto c = allocater.allocate({3, 2, 3});
-    auto d = allocater.allocate({4, 2, 3});
-    auto e = allocater.allocate({5, 2, 3});
+    MemoryPool<int, 5> memoryPool;
 
+    auto a = memoryPool.allocate(1);
+    EXPECT_NE(a, nullptr);
+    EXPECT_EQ(*a, 1);
+    
+    auto b = memoryPool.allocate(2);
+    EXPECT_NE(b, nullptr);
+    EXPECT_EQ(*b, 2);
 
-    std::println("data {} addr {}", a->x, static_cast<void*>(a));
-    std::println("data {} addr {}", b->x, static_cast<void*>(b));
-    std::println("data {} addr {}", c->x, static_cast<void*>(c));
-    std::println("data {} addr {}", d->x, static_cast<void*>(d));
-    std::println("data {} addr {}", e->x, static_cast<void*>(e));
+    auto c = memoryPool.allocate(3);
+    EXPECT_NE(c, nullptr);
+    EXPECT_EQ(*c, 3);
+    
+    auto d = memoryPool.allocate(4);
+    EXPECT_NE(d, nullptr);
+    EXPECT_EQ(*d, 4);
+    
+    auto e = memoryPool.allocate(5);
+    EXPECT_NE(e, nullptr);
+    EXPECT_EQ(*e, 5);
+}
 
-    std::println("deallocating a");
-    allocater.deallocate(a);
-    auto f = allocater.allocate({6, 2, 3});
-    std::println("data {} addr {}", f->x, static_cast<void*>(f));
+TEST(MemoryPoolTests, TestAllocatingOverCapicity)
+{
+    MemoryPool<Vector_3f, 1> memoryPool;
 
-    std::println("deallocating b");
-    allocater.deallocate(b);
-    auto g = allocater.allocate({7, 2, 3});
-    std::println("data {} addr {}", g->x, static_cast<void*>(g));
+    auto a = memoryPool.allocate({1.0, 2.0, 3.0});
+    EXPECT_EQ(a->x, 1.0);
+    EXPECT_EQ(a->y, 2.0);
+    EXPECT_EQ(a->z, 3.0);
+    EXPECT_NE(a, nullptr);
 
+    auto b = memoryPool.allocate({1.0, 2.0, 3.0});
+    EXPECT_EQ(b, nullptr);
+}
+
+TEST(MemoryPoolTests, TestDeallocating)
+{
+    MemoryPool<Vector_3f, 1> memoryPool;
+
+    auto a = memoryPool.allocate({1.0, 2.0, 3.0});
+    EXPECT_EQ(a->x, 1.0);
+    EXPECT_EQ(a->y, 2.0);
+    EXPECT_EQ(a->z, 3.0);
+    
+    memoryPool.deallocate(a);
+    
+    auto b = memoryPool.allocate({4.0, 5.0, 6.0});
+
+    // pointers should match as now using same memory address as deallocated
+    EXPECT_EQ(a, b);
+
+    EXPECT_EQ(b->x, 4.0);
+    EXPECT_EQ(b->y, 5.0);
+    EXPECT_EQ(b->z, 6.0);   
 }
