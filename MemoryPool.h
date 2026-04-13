@@ -26,7 +26,6 @@ public:
         auto next = head.next->next;
         auto d = reinterpret_cast<T*>(head.next);
         d = new (d) T(std::move(inData));
-        d->~T();
         head.next = next;
         return d;
     }
